@@ -14,5 +14,14 @@ public class PruebaTrianguloEq {
 
         double area = tri.calcularArea();
         System.out.println("El área calculada es: " + area);
+
+        // Modificamos el vértice principal (Vértice 1)
+        System.out.println("\nModificando el vértice principal (Vértice 1) de TrianguloEq a [1.0, 1.0]...\n");
+        tri.modificaVerticePrincipal(new Coordenada(1.0, 1.0));
+
+        // Mostramos el TrianguloEq con sus nuevas coordenadas y área
+        System.out.println("-- TrianguloEq con nuevo vértice principal --");
+        System.out.println(tri);
+        System.out.println("Nueva área calculada de TrianguloEq: " + tri.calcularArea());
     }
 }

@@ -1,4 +1,4 @@
-public abstract class Figura implements Desplazable{
+public abstract class Figura implements Desplazable {
     
     protected Coordenada centro;
     protected Coordenada[] vertices;
@@ -26,5 +26,22 @@ public abstract class Figura implements Desplazable{
                 }
             }
         }
+    }
+
+    public Coordenada getCentro() {
+        return centro;
+    }
+
+    public Coordenada[] getVertices() {
+        return vertices;
+    }
+
+    public String imprimirVertices() {
+        if (vertices == null || vertices.length == 0) return "Sin vértices";
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < vertices.length; i++) {
+            sb.append("  Vértice ").append(i + 1).append(": ").append(vertices[i]).append("\n");
+        }
+        return sb.toString();
     }
 }
