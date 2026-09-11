@@ -1,7 +1,7 @@
 public class PruebaFiguras {
     public static void main(String[] args) {
         System.out.println("==================================================");
-        System.out.println("   DEMOSTRACIÓN DE FIGURAS GEOMÉTRICAS Y DESPLAZAMIENTO");
+        System.out.println("   FIGURAS Y DESPLAZAMIENTO");
         System.out.println("==================================================\n");
 
         // -------------------------------------------------------------
