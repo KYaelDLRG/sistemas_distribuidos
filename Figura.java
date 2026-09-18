@@ -4,11 +4,11 @@ public abstract class Figura implements Desplazable {
     protected Coordenada[] vertices;
 
     public Figura(Coordenada centro){
-        this.centro = centro;
+        this.centro = centro != null ? new Coordenada(centro.abcisa(), centro.ordenada()) : new Coordenada(0.0, 0.0);
     }
 
     public Figura(Coordenada centro, int numVertices){
-        this.centro = centro;
+        this.centro = centro != null ? new Coordenada(centro.abcisa(), centro.ordenada()) : new Coordenada(0.0, 0.0);
         this.vertices = new Coordenada[numVertices];
     }
 

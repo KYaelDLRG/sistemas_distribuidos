@@ -1,13 +1,17 @@
 public class Rectangulo extends Figura {
+    private Coordenada superiorIzq;
+    private Coordenada inferiorDer;
     private double base;
     private double altura;
 
     // Constructor principal: recibe centro, base y altura
     public Rectangulo(Coordenada centro, double base, double altura) {
-        super(centro, 4);
+        super(centro != null ? new Coordenada(centro.abcisa(), centro.ordenada()) : new Coordenada(0.0, 0.0), 4);
         this.base = base;
         this.altura = altura;
         calcularVertices();
+        this.superiorIzq = new Coordenada(vertices[0].abcisa(), vertices[0].ordenada());
+        this.inferiorDer = new Coordenada(vertices[2].abcisa(), vertices[2].ordenada());
     }
 
     // Constructor centrado en el origen (0, 0)
@@ -17,23 +21,35 @@ public class Rectangulo extends Figura {
 
     // Constructor por defecto
     public Rectangulo() {
-        this(new Coordenada(0.0, 0.0), 0.0, 0.0);
+        super(new Coordenada(0.0, 0.0), 4);
+        this.superiorIzq = new Coordenada(0.0, 0.0);
+        this.inferiorDer = new Coordenada(0.0, 0.0);
+        this.base = 0.0;
+        this.altura = 0.0;
+        calcularVertices();
     }
 
     // Constructores de compatibilidad con ejercicios previos
     public Rectangulo(double xSupIzq, double ySupIzq, double xInfDer, double yInfDer) {
         super(new Coordenada((xSupIzq + xInfDer) / 2.0, (ySupIzq + yInfDer) / 2.0), 4);
+        this.superiorIzq = new Coordenada(xSupIzq, ySupIzq);
+        this.inferiorDer = new Coordenada(xInfDer, yInfDer);
         this.base = xInfDer - xSupIzq;
         this.altura = ySupIzq - yInfDer;
         calcularVertices();
     }
 
+    // Constructor Ejercicio 1 y 2: recibe dos objetos Coordenada
+    // Corrige el error de contención: crea nuevas instancias Coordenada dentro de Rectangulo (Composición)
     public Rectangulo(Coordenada supIzq, Coordenada infDer) {
         super(new Coordenada((supIzq.abcisa() + infDer.abcisa()) / 2.0,
                              (supIzq.ordenada() + infDer.ordenada()) / 2.0), 4);
         if (supIzq.abcisa() >= infDer.abcisa() || supIzq.ordenada() <= infDer.ordenada()) {
             throw new IllegalArgumentException("La primer coordenada no se encuentra arriba y a la izquierda de la segunda");
         }
+        // Objetos Coordenada contenidos en el objeto Rectangulo (Composición fuerte)
+        this.superiorIzq = new Coordenada(supIzq.abcisa(), supIzq.ordenada());
+        this.inferiorDer = new Coordenada(infDer.abcisa(), infDer.ordenada());
         this.base = infDer.abcisa() - supIzq.abcisa();
         this.altura = supIzq.ordenada() - infDer.ordenada();
         calcularVertices();
@@ -71,18 +87,30 @@ public class Rectangulo extends Figura {
         return altura;
     }
 
-    // Métodos de compatibilidad con PruebaRectangulo
+    @Override
+    public void desplazar(double dx, double dy) {
+        super.desplazar(dx, dy);
+        if (this.superiorIzq != null) {
+            this.superiorIzq = new Coordenada(this.superiorIzq.abcisa() + dx, this.superiorIzq.ordenada() + dy);
+        }
+        if (this.inferiorDer != null) {
+            this.inferiorDer = new Coordenada(this.inferiorDer.abcisa() + dx, this.inferiorDer.ordenada() + dy);
+        }
+    }
+
+    // Métodos getters de las esquinas (Coordenadas contenidas)
     public Coordenada superiorIzq() {
-        return vertices != null ? vertices[0] : null;
+        return superiorIzq != null ? superiorIzq : (vertices != null ? vertices[0] : null);
     }
 
     public Coordenada inferiorDer() {
-        return vertices != null ? vertices[2] : null;
+        return inferiorDer != null ? inferiorDer : (vertices != null ? vertices[2] : null);
     }
 
     @Override
     public String toString() {
-        return "Rectángulo [Base = " + base + ", Altura = " + altura + ", Centro = " + centro + "]\n"
+        return "Esquina superior izquierda: " + superiorIzq() + "\t Esquina inferior derecha: " + inferiorDer() + "\n"
+             + "Rectángulo [Base = " + base + ", Altura = " + altura + ", Centro = " + centro + "]\n"
              + "Vértices:\n" + imprimirVertices();
     }
 }
