@@ -20,27 +20,40 @@ public class PruebaRectangulo{
         ancho = rect2.inferiorDer().abcisa() - rect2.superiorIzq().abcisa();
         System.out.println("Ejercicio 1 el area es: " + ancho*alto);
 
-        // prueba del try-catch con coordenadas mal ordenadas
-        System.out.println("\nEjercicio 2: Probando validación con try-catch:");
-        try {
-            // coordenadas al reves a proposito para que entre al catch
-            Coordenada cInvalida1 = new Coordenada(5, 1);
-            Coordenada cInvalida2 = new Coordenada(2, 4);
+        // =========================================================================
+        // Ejercicio 2: Validación de coordenadas con try-catch
+        // =========================================================================
+        System.out.println("\n==================================================");
+        System.out.println("Ejercicio 2: Validación con try-catch");
+        System.out.println("==================================================");
 
-            System.out.println("Coordenadas proporcionadas:");
-            System.out.println("  - Superior Izquierda pretendida: " + cInvalida1);
-            System.out.println("  - Inferior Derecha pretendida:   " + cInvalida2);
-            System.out.println("Motivo del error:");
-            System.out.println("  * En X: " + cInvalida1.abcisa() + " >= " + cInvalida2.abcisa() + " (no está a la izquierda)");
-            System.out.println("  * En Y: " + cInvalida1.ordenada() + " <= " + cInvalida2.ordenada() + " (no está arriba)");
-            
-            System.out.println("Intentando crear rectángulo con coordenadas incorrectas...");
-            Rectangulo rectInvalido = new Rectangulo(cInvalida1, cInvalida2);
-            
+        // Caso 1: Coordenadas válidas (NO erróneas)
+        System.out.println("\n--- Caso 1: Cuando las coordenadas NO son erróneas ---");
+        try {
+            Coordenada si = new Coordenada(2, 3);
+            Coordenada id = new Coordenada(4, 1);
+            System.out.println("Coordenadas enviadas: Superior Izquierda (2, 3), Inferior Derecha (4, 1)");
+            Rectangulo rectValido = new Rectangulo(si, id);
+            System.out.println("Rectángulo creado exitosamente:");
+            System.out.println(rectValido);
+            alto = rectValido.superiorIzq().ordenada() - rectValido.inferiorDer().ordenada();
+            ancho = rectValido.inferiorDer().abcisa() - rectValido.superiorIzq().abcisa();
+            System.out.println("Área calculada: " + (ancho * alto));
+        } catch (IllegalArgumentException e) {
+            System.out.println("Error al crear el objeto Rectangulo: " + e.getMessage());
+        }
+
+        // Caso 2: Coordenadas inválidas (SÍ erróneas)
+        System.out.println("\n--- Caso 2: Cuando se introduce una coordenada errónea ---");
+        try {
+            Coordenada si = new Coordenada(5, 1);
+            Coordenada id = new Coordenada(2, 4);
+            System.out.println("Coordenadas enviadas: Superior Izquierda (5, 1), Inferior Derecha (2, 4)");
+            System.out.println("Intentando instanciar objeto Rectangulo...");
+            Rectangulo rectInvalido = new Rectangulo(si, id);
             System.out.println("Rectángulo creado exitosamente.");
         } catch (IllegalArgumentException e) {
-            // atrapamos el error del constructor
-            System.out.println("-> Se atrapó la excepción: " + e.getMessage());
+            System.out.println("Error al crear el objeto Rectangulo: " + e.getMessage());
         }
     }
 }
