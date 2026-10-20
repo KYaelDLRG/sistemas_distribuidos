@@ -1,0 +1,124 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    background-color: #f6f7f9;
+    color: #222222;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+.card-container {
+    background-color: #ffffff;
+    width: 100%;
+    max-width: 440px;
+    border: 1px solid #dcdcdc;
+    border-radius: 8px;
+    padding: 32px 28px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.titulo {
+    font-size: 1.25rem;
+    font-weight: 700;
+    text-align: center;
+    line-height: 1.4;
+    color: #111111;
+    margin-bottom: 22px;
+}
+
+.input-container {
+    width: 100%;
+    margin-bottom: 20px;
+}
+
+textarea#numerosInput {
+    width: 100%;
+    padding: 10px 12px;
+    font-family: inherit;
+    font-size: 0.95rem;
+    color: #333333;
+    border: 1px solid #c0c0c0;
+    border-radius: 4px;
+    resize: none;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+textarea#numerosInput:focus {
+    border-color: #555555;
+    box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.08);
+}
+
+.button-container {
+    margin-bottom: 24px;
+}
+
+button#btnEnviar {
+    font-family: inherit;
+    font-size: 0.95rem;
+    color: #222222;
+    background-color: #f7f7f7;
+    border: 1px solid #b5b5b5;
+    border-radius: 4px;
+    padding: 6px 24px;
+    cursor: pointer;
+    transition: background-color 0.15s, border-color 0.15s, transform 0.05s;
+}
+
+button#btnEnviar:hover {
+    background-color: #ebebeb;
+    border-color: #888888;
+}
+
+button#btnEnviar:active {
+    transform: scale(0.98);
+}
+
+.respuesta-container {
+    width: 100%;
+    text-align: center;
+}
+
+.subtitulo {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #222222;
+    margin-bottom: 12px;
+}
+
+.resultado-box {
+    width: 100%;
+    background-color: #f2f2f2;
+    border: 1px solid #e0e0e0;
+    border-radius: 4px;
+    padding: 12px 14px;
+    font-size: 0.95rem;
+    color: #333333;
+    min-height: 44px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    word-break: break-word;
+}
+
+.resultado-box.error {
+    background-color: #ffebee;
+    color: #c62828;
+    border-color: #ffcdd2;
+}
+
+.resultado-box.cargando {
+    color: #666666;
+    font-style: italic;
+}
