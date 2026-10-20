@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Cómputo Distribuido - Búsqueda de Contraseña</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0a0e17;
+            --bg-secondary: #111827;
+            --bg-card: rgba(22, 30, 49, 0.75);
+            --bg-card-hover: rgba(30, 41, 67, 0.85);
+            --border-color: rgba(255, 255, 255, 0.08);
+            --border-glow: rgba(56, 189, 248, 0.3);
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+            --accent-cyan: #38bdf8;
+            --accent-blue: #3b82f6;
+            --accent-purple: #818cf8;
+            --accent-emerald: #10b981;
+            --accent-amber: #f59e0b;
+            --accent-rose: #f43f5e;
+            --font-sans: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            font-family: var(--font-sans);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+            background-image: 
+                radial-gradient(circle at 15% 20%, rgba(56, 189, 248, 0.08) 0%, transparent 40%),
+                radial-gradient(circle at 85% 80%, rgba(129, 140, 248, 0.08) 0%, transparent 40%);
+        }
+
+        .container {
+            max-width: 1040px;
+            margin: 0 auto;
+            padding: 2.5rem 1.5rem;
+            width: 100%;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 2.5rem;
+        }
+
+        .badges {
+            display: flex;
+            justify-content: center;
+            gap: 0.75rem;
+            margin-bottom: 1.25rem;
+            flex-wrap: wrap;
+        }
+
+        .badge {
+            background: rgba(56, 189, 248, 0.1);
+            color: var(--accent-cyan);
+            border: 1px solid rgba(56, 189, 248, 0.25);
+            padding: 0.35rem 0.85rem;
+            border-radius: 9999px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+        }
+
+        .badge-proxy {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--accent-emerald);
+            border-color: rgba(16, 185, 129, 0.25);
+        }
+
+        h1 {
+            font-size: 2.6rem;
+            font-weight: 800;
+            letter-spacing: -0.025em;
+            background: linear-gradient(135deg, #ffffff 30%, #94a3b8 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 0.75rem;
+        }
+
+        .subtitle {
+            color: var(--text-secondary);
+            font-size: 1.05rem;
+            max-width: 680px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+
+        /* Arquitectura Visual */
+        .arch-diagram {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1rem;
+            margin-bottom: 2.5rem;
+            position: relative;
+        }
+
+        @media (max-width: 768px) {
+            .arch-diagram {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .arch-node {
+            background: var(--bg-card);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--border-color);
+            border-radius: 14px;
+            padding: 1.25rem 1rem;
+            text-align: center;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .arch-node:hover {
+            border-color: var(--border-glow);
+            transform: translateY(-2px);
+            background: var(--bg-card-hover);
+        }
+
+        .arch-node.active {
+            border-color: var(--accent-cyan);
+            box-shadow: 0 0 20px rgba(56, 189, 248, 0.25);
+        }
+
+        .node-icon {
+            font-size: 1.8rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .node-title {
+            font-weight: 700;
+            font-size: 0.95rem;
+            color: var(--text-primary);
+            margin-bottom: 0.25rem;
+        }
+
+        .node-port {
+            font-family: var(--font-mono);
+            font-size: 0.8rem;
+            color: var(--accent-cyan);
+        }
+
+        /* Tarjeta Principal */
+        .main-card {
+            background: var(--bg-card);
+            backdrop-filter: blur(16px);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 2.25rem;
+            box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.5);
+            margin-bottom: 2rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .main-card:focus-within {
+            border-color: var(--border-glow);
+        }
+
+        .form-group {
+            margin-bottom: 1.75rem;
+        }
+
+        label {
+            display: block;
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .label-hint {
+            font-weight: 400;
+            font-size: 0.82rem;
+            color: var(--text-muted);
+            margin-left: 0.5rem;
+        }
+
+        .input-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            background: rgba(15, 23, 42, 0.7);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1rem 1.25rem;
+            font-family: var(--font-mono);
+            font-size: 0.92rem;
+            color: var(--text-primary);
+            outline: none;
+            transition: all 0.25s ease;
+        }
+
+        input[type="text"]:focus {
+            border-color: var(--accent-cyan);
+            box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.15);
+            background: rgba(15, 23, 42, 0.95);
+        }
+
+        .quick-actions {
+            display: flex;
+            gap: 0.75rem;
+            margin-top: 0.75rem;
+            flex-wrap: wrap;
+        }
+
+        .btn-text {
+            background: none;
+            border: none;
+            color: var(--accent-cyan);
+            font-size: 0.85rem;
+            font-weight: 500;
+            cursor: pointer;
+            text-decoration: underline;
+            text-underline-offset: 3px;
+            transition: color 0.2s ease;
+        }
+
+        .btn-text:hover {
+            color: #7dd3fc;
+        }
+
+        .btn-submit {
+            width: 100%;
+            background: linear-gradient(135deg, var(--accent-cyan) 0%, var(--accent-blue) 100%);
+            color: #031127;
+            font-family: var(--font-sans);
+            font-weight: 700;
+            font-size: 1.05rem;
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 0.65rem;
+            box-shadow: 0 10px 25px -5px rgba(56, 189, 248, 0.35);
+        }
+
+        .btn-submit:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 30px -5px rgba(56, 189, 248, 0.5);
+        }
+
+        .btn-submit:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .spinner {
+            width: 20px;
+            height: 20px;
+            border: 2.5px solid rgba(3, 17, 39, 0.3);
+            border-top-color: #031127;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            display: none;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Panel de Resultados */
+        .result-panel {
+            margin-top: 2rem;
+            display: none;
+            animation: fadeIn 0.4s ease forwards;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .status-banner {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1rem 1.25rem;
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            border-radius: 12px;
+            margin-bottom: 1.5rem;
+        }
+
+        .status-banner.processing {
+            background: rgba(56, 189, 248, 0.1);
+            border-color: rgba(56, 189, 248, 0.3);
+        }
+
+        .status-banner.error {
+            background: rgba(244, 63, 94, 0.1);
+            border-color: rgba(244, 63, 94, 0.3);
+        }
+
+        .status-left {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: var(--accent-emerald);
+            box-shadow: 0 0 10px var(--accent-emerald);
+        }
+
+        .status-dot.processing {
+            background: var(--accent-cyan);
+            box-shadow: 0 0 10px var(--accent-cyan);
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.4; transform: scale(0.9); }
+        }
+
+        .status-text {
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+
+        .timer-display {
+            font-family: var(--font-mono);
+            font-size: 0.95rem;
+            color: var(--accent-cyan);
+            font-weight: 600;
+        }
+
+        .solution-box {
+            background: rgba(15, 23, 42, 0.85);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 1.75rem;
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .solution-label {
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--text-muted);
+            margin-bottom: 0.5rem;
+        }
+
+        .solution-value {
+            font-family: var(--font-mono);
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: #34d399;
+            text-shadow: 0 0 25px rgba(52, 211, 153, 0.35);
+            letter-spacing: 0.05em;
+        }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1rem;
+        }
+
+        .metric-card {
+            background: rgba(15, 23, 42, 0.5);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1rem 1.25rem;
+        }
+
+        .metric-title {
+            font-size: 0.78rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.35rem;
+        }
+
+        .metric-value {
+            font-family: var(--font-mono);
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            word-break: break-all;
+        }
+
+        footer {
+            margin-top: auto;
+            text-align: center;
+            padding: 2rem 0;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            border-top: 1px solid var(--border-color);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="badges">
+                <span class="badge">Sistemas Distribuidos</span>
+                <span class="badge">Clase 22</span>
+                <span class="badge badge-proxy">NGINX Reverse Proxy :8088</span>
+            </div>
+            <h1>Procesamiento Distribuido</h1>
+            <p class="subtitle">
+                Ataque de fuerza bruta SHA-256 coordinado por un <strong>Servidor Despachador (Master)</strong> y resuelto en paralelo por dos <strong>Workers</strong> a través de <strong>NGINX</strong>.
+            </p>
+        </header>
+
+        <!-- Diagrama de Arquitectura -->
+        <div class="arch-diagram">
+            <div class="arch-node" id="node-browser">
+                <div class="node-icon">🌐</div>
+                <div class="node-title">Navegador Web</div>
+                <div class="node-port">Cliente HTTP</div>
+            </div>
+            <div class="arch-node" id="node-nginx">
+                <div class="node-icon">🔀</div>
+                <div class="node-title">NGINX Proxy</div>
+                <div class="node-port">Puerto 8088</div>
+            </div>
+            <div class="arch-node" id="node-dispatcher">
+                <div class="node-icon">🖥️</div>
+                <div class="node-title">Despachador</div>
+                <div class="node-port">Puerto 8080</div>
+            </div>
+            <div class="arch-node" id="node-workers">
+                <div class="node-icon">⚡</div>
+                <div class="node-title">Workers (x2)</div>
+                <div class="node-port">8081 y 8082</div>
+            </div>
+        </div>
+
+        <!-- Tarjeta Principal de Búsqueda -->
+        <div class="main-card">
+            <form id="hashForm">
+                <div class="form-group">
+                    <label for="hashInput">
+                        Hash SHA-256 Objetivo
+                        <span class="label-hint">(64 caracteres hexadecimales)</span>
+                    </label>
+                    <div class="input-wrapper">
+                        <input 
+                            type="text" 
+                            id="hashInput" 
+                            name="hashInput" 
+                            required 
+                            autocomplete="off" 
+                            spellcheck="false"
+                            placeholder="Ingrese o pegue el hash SHA-256..."
+                            value="de3925d6e4321394d09e782b1c517c4ead2ea4d1209439ece3c42ac43db6d31f"
+                        >
+                    </div>
+                    <div class="quick-actions">
+                        <button type="button" class="btn-text" id="btnPrefillEscom">
+                            Usar Hash de prueba: "escom"
+                        </button>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-submit" id="btnSubmit">
+                    <span class="spinner" id="spinner"></span>
+                    <span id="btnText">Iniciar Búsqueda Distribuida</span>
+                </button>
+            </form>
+
+            <!-- Panel de Resultados -->
+            <div class="result-panel" id="resultPanel">
+                <div class="status-banner" id="statusBanner">
+                    <div class="status-left">
+                        <div class="status-dot" id="statusDot"></div>
+                        <span class="status-text" id="statusText">Búsqueda completada exitosamente</span>
+                    </div>
+                    <div class="timer-display" id="liveTimer">00.00s</div>
+                </div>
+
+                <div class="solution-box" id="solutionBox">
+                    <div class="solution-label">Resultado Obtenido</div>
+                    <div class="solution-value" id="solutionValue">---</div>
+                </div>
+
+                <div class="metrics-grid">
+                    <div class="metric-card">
+                        <div class="metric-title">Tiempo del Servidor (X-debug-info)</div>
+                        <div class="metric-value" id="metricServerTime">---</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-title">Tiempo Total en Navegador (RTT)</div>
+                        <div class="metric-value" id="metricClientTime">---</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-title">Canal de Enrutamiento</div>
+                        <div class="metric-value">NGINX :8088 &rarr; Java :8080</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            Instituto Politécnico Nacional - Escuela Superior de Cómputo (ESCOM)<br>
+            Sistemas Distribuidos &bull; Práctica 22: Servidor Despachador y Reverse Proxy
+        </footer>
+    </div>
+
+    <script>
+        const hashForm = document.getElementById('hashForm');
+        const hashInput = document.getElementById('hashInput');
+        const btnSubmit = document.getElementById('btnSubmit');
+        const btnText = document.getElementById('btnText');
+        const spinner = document.getElementById('spinner');
+        const btnPrefillEscom = document.getElementById('btnPrefillEscom');
+
+        const resultPanel = document.getElementById('resultPanel');
+        const statusBanner = document.getElementById('statusBanner');
+        const statusDot = document.getElementById('statusDot');
+        const statusText = document.getElementById('statusText');
+        const liveTimer = document.getElementById('liveTimer');
+        const solutionValue = document.getElementById('solutionValue');
+        const metricServerTime = document.getElementById('metricServerTime');
+        const metricClientTime = document.getElementById('metricClientTime');
+
+        // Nodos de arquitectura para efecto visual
+        const nodeNginx = document.getElementById('node-nginx');
+        const nodeDispatcher = document.getElementById('node-dispatcher');
+        const nodeWorkers = document.getElementById('node-workers');
+
+        let timerInterval = null;
+        let startTime = null;
+
+        btnPrefillEscom.addEventListener('click', () => {
+            hashInput.value = 'de3925d6e4321394d09e782b1c517c4ead2ea4d1209439ece3c42ac43db6d31f';
+            hashInput.focus();
+        });
+
+        function updateTimer() {
+            const elapsedMs = Date.now() - startTime;
+            const seconds = (elapsedMs / 1000).toFixed(2);
+            liveTimer.textContent = `${seconds}s`;
+        }
+
+        hashForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const hash = hashInput.value.trim();
+            if (!hash) return;
+
+            // Bloquear formulario
+            btnSubmit.disabled = true;
+            spinner.style.display = 'inline-block';
+            btnText.textContent = 'Buscando en Workers...';
+
+            // Activar nodos visuales
+            nodeNginx.classList.add('active');
+            nodeDispatcher.classList.add('active');
+            nodeWorkers.classList.add('active');
+
+            // Mostrar panel en estado de procesamiento
+            resultPanel.style.display = 'block';
+            statusBanner.className = 'status-banner processing';
+            statusDot.className = 'status-dot processing';
+            statusText.textContent = 'Distribuyendo 26 subtareas entre los 2 workers...';
+            solutionValue.textContent = 'Procesando...';
+            metricServerTime.textContent = 'Esperando respuesta...';
+            metricClientTime.textContent = 'En curso...';
+
+            startTime = Date.now();
+            clearInterval(timerInterval);
+            timerInterval = setInterval(updateTimer, 50);
+
+            try {
+                // Petición al endpoint /dispatcher pasando por el Reverse Proxy de NGINX
+                const response = await fetch('/dispatcher', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'text/plain; charset=utf-8',
+                        'X-Debug': 'true'
+                    },
+                    body: hash
+                });
+
+                clearInterval(timerInterval);
+                const totalClientMs = Date.now() - startTime;
+                const totalClientSec = (totalClientMs / 1000).toFixed(2);
+                liveTimer.textContent = `${totalClientSec}s`;
+
+                if (!response.ok) {
+                    throw new Error(`Error HTTP: ${response.status} ${response.statusText}`);
+                }
+
+                const responseText = await response.text();
+                const xDebugInfo = response.headers.get('X-debug-info');
+
+                // Estado exitoso
+                statusBanner.className = 'status-banner';
+                statusDot.className = 'status-dot';
+                statusText.textContent = '¡Búsqueda distribuida completada!';
+                solutionValue.textContent = responseText.trim();
+
+                metricServerTime.textContent = xDebugInfo ? xDebugInfo : 'Disponible en cabecera HTTP';
+                metricClientTime.textContent = `${totalClientSec} segundos (${totalClientMs} ms)`;
+
+            } catch (err) {
+                clearInterval(timerInterval);
+                statusBanner.className = 'status-banner error';
+                statusDot.className = 'status-dot error';
+                statusText.textContent = 'Error durante la comunicación distribuida';
+                solutionValue.textContent = 'ERROR';
+                metricServerTime.textContent = 'N/A';
+                metricClientTime.textContent = err.message;
+            } finally {
+                btnSubmit.disabled = false;
+                spinner.style.display = 'none';
+                btnText.textContent = 'Iniciar Búsqueda Distribuida';
+                nodeNginx.classList.remove('active');
+                nodeDispatcher.classList.remove('active');
+                nodeWorkers.classList.remove('active');
+            }
+        });
+    </script>
+</body>
+</html>
