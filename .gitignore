@@ -21,3 +21,8 @@ replay_pid*
 .vscode/
 .idea/
 *.iml
+
+# NGINX runtime files
+nginx/logs/
+nginx/temp/
+*.pid
