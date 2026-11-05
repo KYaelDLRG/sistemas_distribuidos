@@ -26,3 +26,8 @@ replay_pid*
 nginx/logs/
 nginx/temp/
 *.pid
+
+# Secretos y credenciales de API
+**/credentials.json
+**/api_key.txt
+
